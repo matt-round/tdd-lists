@@ -6,11 +6,11 @@ import random
 REPO_URL = 'https://github.com/matt-round/tdd-lists.git'
 
 def deploy():
-    site_folder = 'home/%s/sites/%s' % (env.user, env.host)
+    site_folder = '/home/%s/sites/%s' % (env.user, env.host)
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
     _get_latest_source(source_folder)
-    _update_settings(source_folder)
+    _update_settings(source_folder, env.host)
     _update_virtualenv(source_folder)
     _update_static_files(source_folder)
     _update_database(source_folder)
@@ -34,7 +34,7 @@ def _update_settings(source_folder, site_name):
         'ALLOWED_HOSTS = .+$',
         'ALLOW_HOSTS = ["%s"]' % (site_name,)
     )
-    secret_key_file = source_folder + 'superlists/secret_key.py'
+    secret_key_file = source_folder + '/superlists/secret_key.py'
     if not exists(secret_key_file):
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
         key = ''.join(random.SystemRandom().choice(chars) for _ in range(50))
@@ -55,6 +55,6 @@ def _update_static_files(source_folder):
     ))
 
 def _update_database(source_folder):
-    run('cd %s && ../virtualenv/bin/python3 manage.py migrate --noiput' % (
+    run('cd %s && ../virtualenv/bin/python3 manage.py migrate --noinput' % (
         source_folder,
     ))
